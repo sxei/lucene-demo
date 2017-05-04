@@ -2,13 +2,6 @@
 <!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j-1.2.dtd">
 <log4j:configuration debug="true" xmlns:log4j="http://jakarta.apache.org/log4j/">
 
-	<!-- 设置根日志，这个决定不同级别的日志具体输出到哪些地方 -->
-	<root>
-		<priority value="info" />
-		<appender-ref ref="console" />
-		<appender-ref ref="file" />
-	</root>
-	
 	<!-- 控制台配置 -->
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
@@ -30,6 +23,13 @@
 	<logger name="com.lutongnet">
 		<level value="debug" />
 	</logger>
+	
+	<!-- 设置根日志，这个决定不同级别的日志具体输出到哪些地方 -->
+	<root>
+		<priority value="info" />
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+	</root>
 	
 	<!-- 
 		格式化日志信息：

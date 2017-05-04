@@ -1,20 +1,8 @@
 package com.test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.sql.ResultSet;
-import java.util.List;
-
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -22,7 +10,6 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -32,12 +19,10 @@ import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
-import org.apache.lucene.search.highlight.TokenSources;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import com.test.util.FileUtil;
 import com.test.util.JdbcUtil;
 
 /**
@@ -47,7 +32,7 @@ import com.test.util.JdbcUtil;
 public class DbSearchDemo
 {
 	public static final String INDEX_PATH = "E:\\lucene-db";
-	public static final String JDBC_URL = "jdbc:mysql://localhost:3306/lucene?useUnicode=true&characterEncoding=utf-8";
+	public static final String JDBC_URL = "jdbc:mysql://localhost:3306/lucene-demo?useUnicode=true&characterEncoding=utf-8";
 	public static final String USER = "root";
 	public static final String PWD = "root";
 	
@@ -67,7 +52,7 @@ public class DbSearchDemo
 			indexWriter.deleteAll();// 清除以前的index
 			
 			JdbcUtil jdbc = new JdbcUtil(JDBC_URL, USER, PWD);
-			ResultSet rs = jdbc.query("select * from b_blog");
+			ResultSet rs = jdbc.query("select * from blog");
 			while(rs.next())
 			{
 				Document document = new Document();
@@ -75,9 +60,8 @@ public class DbSearchDemo
 				document.add(new Field("title", rs.getString("title"), TextField.TYPE_STORED));
 				document.add(new Field("content", rs.getString("content"), TextField.TYPE_STORED));
 				document.add(new Field("tag", rs.getString("tags"), TextField.TYPE_STORED));
-				document.add(new Field("entryName", rs.getString("entry_name"), TextField.TYPE_STORED));
+				document.add(new Field("url", rs.getString("url"), TextField.TYPE_STORED));
 				indexWriter.addDocument(document);
-				System.out.println(rs.getString("title"));
 			}
 			jdbc.closeAll();
 		}
@@ -146,7 +130,9 @@ public class DbSearchDemo
 				//TokenStream tokenStream = TokenSources.getAnyTokenStream(indexSearcher.getIndexReader(), scoreDoc.doc, "content", document, analyzer);
 				//System.out.println(highlighter.getBestFragment(tokenStream, content));
 				System.out.println("-----------------------------------------");
-				System.out.println(document.get("title") + ":" + document.get("entryName"));
+				System.out.println("文章标题："+document.get("title"));
+				System.out.println("文章地址：" + document.get("url"));
+				System.out.println("文章内容：");
 				System.out.println(highlighter.getBestFragment(analyzer, "content", content));
 				System.out.println("");
 				// 8、根据Document对象获取需要的值
@@ -173,6 +159,6 @@ public class DbSearchDemo
 	{
 		DbSearchDemo demo = new DbSearchDemo();
 		demo.creatIndex();
-		demo.search("mysql");
+		demo.search("android");
 	}
 }
